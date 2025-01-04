@@ -1,0 +1,24 @@
+{% extends "chat/base.html" %}
+{% block content %}
+<table class="table">
+    <tr>
+        <th>Имя</th>
+        <th>Почта</th>
+        <th>Возраст</th>
+    </tr>
+    <tr>
+        <td>
+            {{ db_user.name }}
+        </td>
+        <td>
+            {{ db_user.email }}
+        </td>
+        <td>
+            {{ db_user.age }}
+        </td>
+        <th></th>
+    </tr>
+</table>
+<!--<button class="btn" type="submit">Общаться</button>-->
+<a href="/{{ current_user.id }}/{{ user.id }}">Общаться</a>
+{% endblock %}

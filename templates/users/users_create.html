@@ -1,0 +1,11 @@
+{% extends "chat/base.html" %}
+{% block content %}
+<form class="form" action="" method="post">
+  <input class="input" type="text" name="name" placeholder="Ваше имя">
+  <input class="input" type="email" name="email" placeholder="Ваш e-mail">
+  <input class="input" type="number" name="age" placeholder="Ваш возраст">
+  <input class="input" type="password" name="password" placeholder="Пароль">
+  <input class="input" type="password" name="password" placeholder="Пароль еще раз">
+  <button class="btn" type="submit">Регистрация</button>
+</form>
+{% endblock %}

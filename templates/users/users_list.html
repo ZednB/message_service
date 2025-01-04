@@ -1,0 +1,26 @@
+{% extends "chat/base.html" %}
+{% block content %}
+<table class="table">
+    <tr>
+        <th>Имя пользователя</th>
+        <th>Почта пользователя</th>
+        <th>Возраст</th>
+    </tr>
+    {% for user in db_user %}
+    <tr>
+        <td>
+            {{ user.name }}
+        </td>
+        <td>
+            {{ user.email }}
+        </td>
+        <td>
+            {{ user.age }}
+        </td>
+        <td>
+            <a href="/{{ user_id }}/{{ user.id }}">Написать</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

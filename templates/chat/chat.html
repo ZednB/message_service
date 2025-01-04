@@ -1,0 +1,45 @@
+{% extends "chat/base.html" %}
+
+{% block content %}
+<div>
+    <h2>Чат с пользователем #{{ recipient_id }} {{ username }}</h2>
+    <div id="messages">
+        <!-- Сообщения будут появляться здесь -->
+    </div>
+
+    <input type="text" id="messageText" placeholder="Введите сообщение">
+    <button onclick="sendMessage()">Отправить</button>
+</div>
+
+<script>
+
+    const userId = {{ user_id }};
+    const recipientId = {{ recipient_id }};
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${userId}/${recipientId}`);
+
+    ws.onmessage = function(event) {
+        const messages = document.getElementById('messages');
+        const newMessage = document.createElement('div');
+        newMessage.textContent = event.data;
+        messages.appendChild(newMessage);
+    };
+
+    function sendMessage() {
+        const input = document.getElementById('messageText');
+        const message = input.value;
+        if (message) {
+        const messages = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.textContent = `Вы: ${message}`;
+            messages.appendChild(newMessage);
+
+            ws.send(message);
+            input.value = '';
+        }
+    }
+
+    ws.onclose = function() {
+        alert("Соединение закрыто.");
+    };
+</script>
+{% endblock %}
