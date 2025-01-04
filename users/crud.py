@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from fastapi.responses import RedirectResponse
 
@@ -121,10 +122,17 @@ async def list_user(
 
 
 @router.get("/profile/{user_id}", response_class=HTMLResponse)
-async def get_profile_form(request: Request, current_user: User = Depends(fastapi_users.current_user())):
-    return templates.TemplateResponse("users/user_profile.html", {"request": request, "current_user": current_user})
+async def get_profile(user_id: int, request: Request, db: Session = Depends(get_db)):
+    current_user_id = request.cookies.get("current_user_id")
+    if not current_user_id:
+        raise HTTPException(status_code=401, detail="Неавторизованный доступ")
 
+    current_user = db.query(User).filter(User.id == int(current_user_id)).first()
+    if not current_user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-@router.get("/profile/{user_id}", response_model=DbUser)
-async def get_profile(db: Session = Depends(get_db)):
-    return db.query(User).first()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    return templates.TemplateResponse("users/user_profile.html", {"request": request, "current_user": current_user, "user": user})
