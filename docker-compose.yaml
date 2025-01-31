@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  db:
+    image: 'postgres'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+    env_file:
+      - .env
+  app:
+    build: .
+    command: uvicorn main:app --reload
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+  redis:
+    image: redis:latest
+    restart: on-failure
+    expose:
+      - '6379'
+  celery:
+    build: .
+    tty: true
+    command: celery -A telegram_bot.celery_config worker
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+      - app
+    env_file:
+      - .env
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+volumes:
+  postgres_data:
