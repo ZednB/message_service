@@ -1,4 +1,3 @@
-import logging
 from typing import List
 from fastapi.responses import RedirectResponse
 
@@ -65,7 +64,6 @@ async def login_user(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    print(f"Попытка входа: email={email}, password={password}")
     db_user = db.query(User).filter(User.email == email, User.password == password).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="Неверный логин или пароль")

@@ -1,8 +1,16 @@
-from fastapi import WebSocket, WebSocketDisconnect, APIRouter
+import logging
+from typing import List
 
+from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Depends
 
+from chat.crud import save_message
+from chat.models import Message
+from chat.service import get_message_history
+from schemas import MessageSchema
 from users.models import User
-from db import SessionLocal
+from db import SessionLocal, get_db
+from sqlalchemy.orm import Session
+from telegram_bot.tasks import send_telegram_message
 
 router = APIRouter(
     prefix='',
@@ -48,6 +56,18 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, recipient_id: i
     try:
         while True:
             data = await websocket.receive_text()
+            save_message(db, sender_id=user_id, recipient_id=recipient_id, content=data)
+            send_telegram_message.apply_async(args=[f"Новое сообщение от {user_id} к {recipient_id}: {data}"],
+                                              queue='telegram')
+            print(f"Задача отправлена в Celery: {data}")
+            logging.info(f"Задача отправлена в очередь: Новое сообщение от {user_id} к {recipient_id}: {data}")
             await manager.send_personal_message(f"{username}: {data}", recipient_id)
     except WebSocketDisconnect:
         manager.disconnect(user_id)
+
+
+@router.get("/history/{user_id}/{recipient_id}", response_model=List[MessageSchema])
+def get_conversation(user_id: int, recipient_id: int, db: Session = Depends(get_db)):
+    messages = get_message_history(db, user_id, recipient_id)
+    return messages
+

@@ -18,9 +18,22 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 from users.models import User
+from chat.models import Message
+from db import Base
+
 
 # target_metadata = mymodel.Base.metadata
-target_metadata = User.metadata
+# target_metadata = User.metadata
+# target_metadata = Message.metadata
+# target_metadata = Base.metadata
+def get_metadata():
+    from chat.models import Message  # Импортируем модели внутри функции
+    from users.models import User
+    return Base.metadata
+
+
+target_metadata = get_metadata()
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

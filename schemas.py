@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -16,3 +18,20 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class MessageSchema(BaseModel):
+    id: int
+    sender_id: int
+    recipient_id: int
+    content: str
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class MessageCreate(BaseModel):
+    sender_id: int
+    recipient_id: int
+    content: str

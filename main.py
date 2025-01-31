@@ -20,13 +20,13 @@ async def get_main_page(request: Request):
 
 @app.get('/{user_id}/{recipient_id}')
 async def get_chat_page(request: Request, user_id: int, recipient_id: int, db: Session = Depends(db.get_db)):
-        user = db.query(User).filter(User.id == user_id).first()
-        recipient = db.query(User).filter(User.id == recipient_id).first()
-        if user is None or recipient is None:
-            return HTMLResponse(content="Пользователь не найден", status_code=404)
-        return templates.TemplateResponse("chat/chat.html",{
-            "request": request,
-            "user_id": user_id,
-            "recipient_id": recipient_id,
-            "username": user.name
-        })
+    user = db.query(User).filter(User.id == user_id).first()
+    recipient = db.query(User).filter(User.id == recipient_id).first()
+    if user is None or recipient is None:
+        return HTMLResponse(content="Пользователь не найден", status_code=404)
+    return templates.TemplateResponse("chat/chat.html", {
+        "request": request,
+        "user_id": user_id,
+        "recipient_id": recipient_id,
+        "username": user.name
+    })
